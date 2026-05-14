@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Evaluate - Manipuri Stemmer{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-white border-0 pt-4">
+                <h2 class="text-center"><i class="fas fa-chart-line"></i> Evaluate Stemmer Accuracy</h2>
+                <p class="text-muted text-center">Upload a CSV with <code>word</code> and <code>true_stem</code> columns</p>
+            </div>
+            <div class="card-body p-4">
+                <form id="evalForm" enctype="multipart/form-data" method="post" action="/evaluate">
+                    <div class="mb-3">
+                        <label class="form-label">Choose CSV file</label>
+                        <input type="file" name="file" class="form-control" accept=".csv" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-play"></i> Run Evaluation</button>
+                </form>
+                <hr>
+                <form action="/evaluate_gold" method="post">
+                    <button type="submit" class="btn btn-outline-success w-100"><i class="fas fa-database"></i> Evaluate on Built‑in Gold Standard</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

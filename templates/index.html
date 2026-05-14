@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Stemmer - Manipuri Stemmer{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-white border-0 pt-4 text-center">
+                <h1 class="display-5 fw-bold text-gradient">📝 Manipuri Stemmer</h1>
+                <p class="lead text-muted">Meitei Mayek Script — A Grapheme-Aware Rule-Based Stemmer</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row text-center mb-4">
+                    <div class="col">
+                        <div class="metric-card p-3">
+                            <div class="text-muted small">📖 Prefixes</div>
+                            <div class="metric-value h3">{{ prefix_count }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card p-3">
+                            <div class="text-muted small">🔚 Suffixes</div>
+                            <div class="metric-value h3">{{ suffix_count }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card p-3">
+                            <div class="text-muted small">⚙️ Algorithm</div>
+                            <div class="metric-value h3">Prefix+Suffix</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Enter a Manipuri word:</label>
+                    <div class="input-group">
+                        <input type="text" id="wordInput" class="form-control form-control-lg" placeholder="e.g., ꯀꯝꯗꯧꯔꯤꯒꯦ" autocomplete="off">
+                        <button class="btn btn-primary btn-lg" id="stemBtn"><i class="fas fa-magic"></i> Get Stem</button>
+                    </div>
+                </div>
+
+                <div id="resultArea" class="alert alert-info d-none">
+                    <strong>Stem:</strong> <span id="stemResult"></span>
+                </div>
+
+                <!-- On-screen keyboard toggle -->
+                <div class="mt-3">
+                    <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#keyboardCollapse">
+                        <i class="fas fa-keyboard"></i> Show Meitei Mayek Keyboard
+                    </button>
+                </div>
+                <div class="collapse mt-3" id="keyboardCollapse">
+                    <div class="card card-body">
+                        <div id="meiteiKeyboard"></div>
+                        <div class="mt-2 d-flex gap-2">
+                            <button class="btn btn-warning" id="backspaceBtn"><i class="fas fa-backspace"></i> Backspace</button>
+                            <button class="btn btn-danger" id="clearBtn"><i class="fas fa-trash-alt"></i> Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <div class="text-center">
+                    <p class="mb-2 fw-semibold">📌 Try examples:</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        {% for ex in ['ꯀꯝꯗꯧꯔꯤꯒꯦ', 'ꯅꯨꯄꯥꯁꯤ', 'ꯆꯥꯅꯕꯥ', 'ꯏꯃꯥ', 'ꯄꯨꯁꯤꯟꯍꯟꯕ'] %}
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-word="{{ ex }}">{{ ex }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/keyboard.js') }}"></script>
+<script>
+$(document).ready(function() {
+    // Stemming
+    $('#stemBtn').click(function() {
+        var word = $('#wordInput').val().trim();
+        if (!word) {
+            alert('Please enter a word.');
+            return;
+        }
+        $.ajax({
+            url: '/stem',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({word: word}),
+            success: function(data) {
+                $('#stemResult').text(data.stem);
+                $('#resultArea').removeClass('d-none');
+            },
+            error: function() {
+                alert('Error stemming word.');
+            }
+        });
+    });
+
+    // Example buttons
+    $('.example-btn').click(function() {
+        var word = $(this).data('word');
+        $('#wordInput').val(word);
+        $('#stemBtn').click();
+    });
+
+    // Keyboard integration
+    var keyboard = new MeiteiKeyboard('meiteiKeyboard');
+    keyboard.onCharAdded = function(ch) {
+        $('#wordInput').val($('#wordInput').val() + ch);
+    };
+    $('#backspaceBtn').click(function() {
+        var val = $('#wordInput').val();
+        $('#wordInput').val(val.slice(0, -1));
+    });
+    $('#clearBtn').click(function() {
+        $('#wordInput').val('');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+# Core dependencies for Manipuri Stemmer 
+# Python 3.6 or higher required 
+ 
+# No external dependencies required for basic stemmer functionality 
+# The stemmer uses only Python standard library 
